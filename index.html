@@ -1,27 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <title>Twittler</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
   </head>
   <body>
-    <script>
+    <!-- Header -->
+    <header class="row">
+      <div class="grid">
+
+        <!--Twittler Logo-->
+        <header class="col-1-3">
+          <h1>Twittler</h1>
+        </header><!--
+
+        Input Box
+        --><header class="col-1-3">
+          <textarea name="comment">What's on your mind?</textarea>
+        </header><!--
+
+        Welcoming Visitor
+        --><header class="col-1-3">
+          <h1 class="center">Welcome Visitor!</h1>
+        </header>
+
+      </div>
+    </header>
+    
+    <section class="container">
+      <!--New Tweets Button-->
+      <div class="btn wrapper">
+        <p>See more tweets<p>
+      </div>
+      
+      <!--Tweets-->
+      <div id="tweets">
+        
+      </div>
+    </section>
+     <script>
 
       $(document).ready(function(){
-        var $body = $('body');
+        //Initialize empty string for Tweets
+        var $body = $("#tweets");
         $body.html('');
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
+        //Initialize for Initial tweets
+        var allTweets = streams.home;
+        var index = allTweets.length - 1;
+        var tweetCount = 0;
+
+        //First 11 tweets
+        while(index >= 0) {
           var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
+          var $tweet = $('<div class=tweet></div>');
+          $tweet.text('@' + tweet.user + ': ' + tweet.message + ' length:' + allTweets.length + ' index:' + index + ' tweetcount ' + tweetCount);
+          $tweet.prependTo($body);
           index -= 1;
+          tweetCount += 1;
         }
+        
+        //Display New Tweets With btn Click Event
+        $(".btn.wrapper").click(function() {
+          var counter = 0;
+          for (var i = tweetCount; i < allTweets.length; i++) {
+            var tweet = streams.home[i];
+            var $tweet = $('<div class=tweet></div>');
+            $tweet.text('@' + tweet.user + ': ' + tweet.message + ' length:' + allTweets.length + ' index:' + index + ' tweetcount ' + tweetCount);
+            $tweet.prependTo($body);
+            counter += 1;
+          }
+          tweetCount += counter;
+        });
 
       });
-
     </script>
   </body>
 </html>
+
+<!-- 
+users = ['douglascalhoun', 'shawndrost', 'sharksforcheap', 'mracus']; <- usernames
+
+streams = {
+  users: {
+    douglascalhoun: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
+    shawndrost: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
+    sharksforcheap: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
+    mracus: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
+  }
+  home: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman', ]
+}
+-->
+
+<!-- This is a mostly-empty repo, with a file that creates some data that represents twitter users and their tweets. It's the data you would expect to see if you had created a twitter account and followed a few people. (More tweets appear over time.)
+
+That file is called data_generator.js. You don't need to understand the code that's in it, but here's what it does:
+
+Creates two global variables, users and streams.
+users is an array of strings -- all the usernames that you're following.
+streams is an object with two properties, users and home.
+streams.home is an array of all tweets from all the users you're following.
+streams.users is an object with properties for each user. streams.users.shawndrost has all of shawndrost's tweets.
+Kicks off a periodic process that puts more data in streams.
+You'll mostly be working in the javascript block of index.html. Note: The generated tweets will be displayed in reverse chronological order.
+
+1. Show the user new tweets somehow. (You can show them automatically as they're created, or create a button that displays new tweets.)
+2. Display the timestamps of when the tweets were created. This timestamp should reflect the actual time the tweets were created, and should not just be hardcoded.
+3. Design your interface so that you want to look at and use the product you're making.
+4. Allow the user to click on a username to see that user's timeline.
+
+-->
+
+<!--http://timeago.yarp.com/-->
+
