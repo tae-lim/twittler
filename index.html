@@ -6,6 +6,9 @@
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <script src="jquery.js"></script>
+    <script src="moment.js"></script>
+    <script src="livestamp.js"></script>
   </head>
   <body>
     <!-- Header -->
@@ -14,17 +17,17 @@
 
         <!--Twittler Logo-->
         <header class="col-1-3">
-          <h1>Twittler</h1>
+          <h1 class="logo">Twittler</h1>
         </header><!--
 
         Input Box
         --><header class="col-1-3">
-          <textarea name="comment">What's on your mind?</textarea>
+          <textarea name="comment center">"What's on your mind?"" Doesn't work... For now...</textarea>
         </header><!--
 
         Welcoming Visitor
         --><header class="col-1-3">
-          <h1 class="center">Welcome Visitor!</h1>
+          <h1 class="welcome">Welcome Friend!</h1>
         </header>
 
       </div>
@@ -33,17 +36,23 @@
     <section class="container">
       <!--New Tweets Button-->
       <div class="btn wrapper">
-        <p>See more tweets<p>
+        <p>Show me new tweets!<p>
       </div>
       
       <!--Tweets-->
       <div id="tweets">
-        
+      </div>
+
+      <!--Users-->
+      <div id="user">
       </div>
     </section>
      <script>
 
       $(document).ready(function(){
+        //Hide user block. Will use for displaying tweets by user
+        $("#user").hide();
+
         //Initialize empty string for Tweets
         var $body = $("#tweets");
         $body.html('');
@@ -53,66 +62,70 @@
         var index = allTweets.length - 1;
         var tweetCount = 0;
 
-        //First 11 tweets
+        //Display First 11 Tweets
         while(index >= 0) {
-          var tweet = streams.home[index];
+          var tweet = allTweets[index];
+          
+          //Create classes for individual parts of tweet
           var $tweet = $('<div class=tweet></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message + ' length:' + allTweets.length + ' index:' + index + ' tweetcount ' + tweetCount);
+          var $time = $('<span class=dateTime></span>');
+          var $message = $('<div class=message></div>');
+          var $user  = $('<div class=user teaser></div>');
+          
+          //Prepend/Append to main tweet and body
           $tweet.prependTo($body);
+          $time.attr('data-livestamp', tweet.created_at.toUTCString()).appendTo($tweet);
+          $message.text(tweet.message).appendTo($tweet);
+          $user.addClass(tweet.user).attr('data-user', tweet.user).text('- @' + tweet.user + ' ').appendTo($tweet)
+          
           index -= 1;
           tweetCount += 1;
         }
         
         //Display New Tweets With btn Click Event
         $(".btn.wrapper").click(function() {
-          var counter = 0;
-          for (var i = tweetCount; i < allTweets.length; i++) {
-            var tweet = streams.home[i];
+          
+          // Resets main body to show all current tweets
+          // $("#user").slideDown();
+          // $("#tweets").slideUp();
+
+          var newTweets = 0;
+          for (var index = tweetCount; index < allTweets.length; index++) {
+            var tweet = allTweets[index];
+            
+            //Create classes for individual parts of tweet
             var $tweet = $('<div class=tweet></div>');
-            $tweet.text('@' + tweet.user + ': ' + tweet.message + ' length:' + allTweets.length + ' index:' + index + ' tweetcount ' + tweetCount);
+            var $time = $('<span class=dateTime></span>');
+            var $message = $('<div class=message></div>');
+            var $user  = $('<div class=user></div>');
+          
+            //Prepend/Append to main tweet and body
             $tweet.prependTo($body);
-            counter += 1;
+            $time.attr('data-livestamp', tweet.created_at.toUTCString()).appendTo($tweet);
+            $message.text(tweet.message).appendTo($tweet);
+            $user.addClass(tweet.user).attr('data-user', tweet.user).text('- @' + tweet.user + ' ').appendTo($tweet)
+            
+            newTweets += 1;
           }
-          tweetCount += counter;
+          tweetCount += newTweets;
         });
 
+        //Display user timeline when clicking user. Currently NONFUNCTIONAL
+        //When iterating through all tweets by index from streams.home, alert(tweet.user) returns [object][object] and can't proceed to use comparison operator to filter out tweets by users.
+        $(".user").click(function() {
+          // Resets main body to show all current tweets
+          // $("#user").slideDown();
+          // $("#tweets").slideUp();
+
+          //Iterate through tweets. Compare user[index] to user
+          var user = $(this).data('user');
+          alert(user);
+
+          //Filter by user. Prepend/append to "#user".
+
+        });
       });
     </script>
   </body>
 </html>
-
-<!-- 
-users = ['douglascalhoun', 'shawndrost', 'sharksforcheap', 'mracus']; <- usernames
-
-streams = {
-  users: {
-    douglascalhoun: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
-    shawndrost: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
-    sharksforcheap: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
-    mracus: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman']
-  }
-  home: ['ask me how i enjoyed this cat #magic', 'efficiently automated this mind #burningman', ]
-}
--->
-
-<!-- This is a mostly-empty repo, with a file that creates some data that represents twitter users and their tweets. It's the data you would expect to see if you had created a twitter account and followed a few people. (More tweets appear over time.)
-
-That file is called data_generator.js. You don't need to understand the code that's in it, but here's what it does:
-
-Creates two global variables, users and streams.
-users is an array of strings -- all the usernames that you're following.
-streams is an object with two properties, users and home.
-streams.home is an array of all tweets from all the users you're following.
-streams.users is an object with properties for each user. streams.users.shawndrost has all of shawndrost's tweets.
-Kicks off a periodic process that puts more data in streams.
-You'll mostly be working in the javascript block of index.html. Note: The generated tweets will be displayed in reverse chronological order.
-
-1. Show the user new tweets somehow. (You can show them automatically as they're created, or create a button that displays new tweets.)
-2. Display the timestamps of when the tweets were created. This timestamp should reflect the actual time the tweets were created, and should not just be hardcoded.
-3. Design your interface so that you want to look at and use the product you're making.
-4. Allow the user to click on a username to see that user's timeline.
-
--->
-
-<!--http://timeago.yarp.com/-->
 
