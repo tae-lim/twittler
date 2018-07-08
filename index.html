@@ -50,19 +50,23 @@
      <script>
 
       $(document).ready(function(){
-        //Hide user block. Will use for displaying tweets by user
+        //Hide user block at load
         $("#user").hide();
 
-        //Initialize empty string for Tweets
+        //Initialize empty string for tweets
         var $body = $("#tweets");
         $body.html('');
 
-        //Initialize for Initial tweets
+        //Initialize empty string for user tweets
+        var $userBody = $("#user");
+        $userBody.html('');
+
+        //Initialize for initial tweets
         var allTweets = streams.home;
         var index = allTweets.length - 1;
         var tweetCount = 0;
 
-        //Display First 11 Tweets
+        //Display first 11 tweets
         while(index >= 0) {
           var tweet = allTweets[index];
           
@@ -72,7 +76,7 @@
           var $message = $('<div class=message></div>');
           var $user  = $('<div class=user teaser></div>');
           
-          //Prepend/Append to main tweet and body
+          //Prepend/Append to $body
           $tweet.prependTo($body);
           $time.attr('data-livestamp', tweet.created_at.toUTCString()).appendTo($tweet);
           $message.text(tweet.message).appendTo($tweet);
@@ -84,11 +88,11 @@
         
         //Display New Tweets With btn Click Event
         $(".btn.wrapper").click(function() {
+          //Show all current tweets and reset user tweets
+          $("#user").text('');
+          $("#tweets").slideDown();
           
-          // Resets main body to show all current tweets
-          // $("#user").slideDown();
-          // $("#tweets").slideUp();
-
+          //Iterate and display all Tweets
           var newTweets = 0;
           for (var index = tweetCount; index < allTweets.length; index++) {
             var tweet = allTweets[index];
@@ -99,7 +103,7 @@
             var $message = $('<div class=message></div>');
             var $user  = $('<div class=user></div>');
           
-            //Prepend/Append to main tweet and body
+            //Prepend/append to main tweet and body
             $tweet.prependTo($body);
             $time.attr('data-livestamp', tweet.created_at.toUTCString()).appendTo($tweet);
             $message.text(tweet.message).appendTo($tweet);
@@ -110,19 +114,34 @@
           tweetCount += newTweets;
         });
 
-        //Display user timeline when clicking user. Currently NONFUNCTIONAL
-        //When iterating through all tweets by index from streams.home, alert(tweet.user) returns [object][object] and can't proceed to use comparison operator to filter out tweets by users.
-        $(".user").click(function() {
-          // Resets main body to show all current tweets
-          // $("#user").slideDown();
-          // $("#tweets").slideUp();
-
-          //Iterate through tweets. Compare user[index] to user
+        //Display user tweets With user click event
+        $('.user').click(function() {
+          
+          //Hide main tweets, show user tweets
+          $("#user").slideDown();
+          $("#tweets").slideUp();
+          
+          //Username
           var user = $(this).data('user');
-          alert(user);
+          
+          //Filter through all users for selected user and prepend/append user tweets to $userBody
+          for (var tweeter in streams.users) {
+            if (user === tweeter) {
+              for (var i = 0; i < streams.users[tweeter].length; i++) {
+                var tweet = streams.users[tweeter][i];
 
-          //Filter by user. Prepend/append to "#user".
+                var $tweet = $('<div class=tweet></div>');
+                var $time = $('<span class=dateTime></span>');
+                var $message = $('<div class=message></div>');
+                var $user  = $('<div class=user></div>');
 
+                $tweet.prependTo($userBody);
+                $time.attr('data-livestamp', tweet.created_at.toUTCString()).appendTo($tweet);
+                $message.text(tweet.message).appendTo($tweet);
+                $user.addClass(tweet.user).attr('data-user', tweet.user).text('- @' + tweet.user + ' ').appendTo($tweet)
+              }
+            }
+          }
         });
       });
     </script>
